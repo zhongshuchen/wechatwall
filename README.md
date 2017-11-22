@@ -1,2 +1,2 @@
 # wechatwall
-A wechat wall implement by php
+A wechat wall implemented by php

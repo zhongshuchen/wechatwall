@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+	<title>微信墙</title>
+	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	<style>
+	/* 使用css 对消息进行简单布局 */
+	#main{
+		width:100%;
+	}
+	.message{
+		display:flex;
+		padding:20px 0;
+		width:100%;
+		font-size:40px;
+		border-bottom:dashed 1px #666;
+	}
+	.message>.avatar{
+		width:140px;
+	}
+	.message>.avatar>img{
+		width:120px;
+		height:120px;
+		border-radius:50%;
+	}
+	.message>.content{
+		flex-grow:1;
+	}
+	</style>
+</head>
+<body>
+	<div id="main">
+	</div>
+</body>
+<script>
+	$(document).ready(function(){
+		//建立监听
+		var source=new EventSource('../server/push.php');
+
+		//服务器消息发来时，将消息整理好添加到 #main 中
+		source.onmessage=function(msg){
+			var data=JSON.parse(msg.data);
+			//判断解析后数据是不是数组
+			if(data.constructor.toString().indexOf('Array')>0)
+				data.forEach(function(message){
+					addMsg(message);
+				});
+		}
+	});
+
+	function addMsg(message){
+		var newElement=$('<div></div>')
+		.addClass('message')
+		.html(`
+				<div class="avatar"><img src="${message.avatarUrl}"></div>
+				<div class="content"><p>${message.nickname}: ${message.content}</p></div>
+		`);
+		$('#main').append(newElement);
+
+		//让滚动条是始终在最下方
+		$(document).scrollTop(document.body.scrollHeight);
+	}
+</script>
+</html>
